@@ -64,7 +64,6 @@ ENDC
     ld a, e
     cp $34 ; End of logo
     jr nz, .loadLogoLoop
-    call ReadTrademarkSymbol
 
 ; Clear the second VRAM bank
     ld a, 1
@@ -550,9 +549,6 @@ KeyCombinationPalettes:
     db 53 * 3 ; Up + A + B
     db 54 * 3 ; Down + A + B
 
-TrademarkSymbol:
-    db $3c,$42,$b9,$a5,$b9,$a5,$42,$3c
-
 SameBoyLogo:
     incbin "SameBoyLogo.pb12"
 
@@ -733,35 +729,8 @@ LoadTileset:
     jr nz, .loop
     jr .refill
 
-; End PB12 decoding.  The rest uses HL as the destination
+; End PB12 decoding.
 .sameboyLogoEnd
-    ld h, d
-    ld l, $80
-
-; Copy (unresized) ROM logo
-    ld de, $104
-.CGBROMLogoLoop
-    ld c, $f0
-    call ReadCGBLogoHalfTile
-    add a, 22
-    ld e, a
-    call ReadCGBLogoHalfTile
-    sub a, 22
-    ld e, a
-    cp $1c
-    jr nz, .CGBROMLogoLoop
-    inc hl
-    ; fallthrough
-ReadTrademarkSymbol:
-    ld de, TrademarkSymbol
-    ld c,$08
-.loadTrademarkSymbolLoop:
-    ld a,[de]
-    inc de
-    ldi [hl],a
-    inc hl
-    dec c
-    jr nz, .loadTrademarkSymbolLoop
     ret
 
 DoIntroAnimation:
